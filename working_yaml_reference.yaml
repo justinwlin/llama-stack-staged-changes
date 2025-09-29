@@ -1,0 +1,141 @@
+version: 2
+image_name: llamastack-runpod
+container_image: null
+apis:
+- inference
+- safety
+- agents
+- batches
+- vector_io
+- datasetio
+- scoring
+- eval
+- post_training
+- tool_runtime
+- telemetry
+- files
+providers:
+  inference:
+  - provider_id: runpod
+    provider_type: remote::runpod
+    config:
+      url: ${env.RUNPOD_URL:=}
+      api_token: ${env.RUNPOD_API_TOKEN}
+    module: null
+  safety:
+  - provider_id: llama-guard
+    provider_type: inline::llama-guard
+    config: {}
+    module: null
+  agents:
+  - provider_id: meta-reference
+    provider_type: inline::meta-reference
+    config:
+      persistence_store:
+        type: sqlite
+        db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/llamastack-runpod}/agents_store.db
+      responses_store:
+        type: sqlite
+        db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/llamastack-runpod}/responses_store.db
+    module: null
+  batches:
+  - provider_id: reference
+    provider_type: inline::reference
+    config:
+      kvstore:
+        type: sqlite
+        db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/llamastack-runpod}/batches.db
+    module: null
+  vector_io:
+  - provider_id: meta-reference
+    provider_type: inline::meta-reference
+    config:
+      kvstore:
+        type: sqlite
+        db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/llamastack-runpod}/faiss_store.db
+    module: null
+  datasetio:
+  - provider_id: localfs
+    provider_type: inline::localfs
+    config:
+      kvstore:
+        type: sqlite
+        db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/llamastack-runpod}/localfs_datasetio.db
+    module: null
+  scoring:
+  - provider_id: basic
+    provider_type: inline::basic
+    config: {}
+    module: null
+  eval:
+  - provider_id: meta-reference
+    provider_type: inline::meta-reference
+    config:
+      kvstore:
+        type: sqlite
+        db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/llamastack-runpod}/meta_reference_eval.db
+    module: null
+  post_training:
+  - provider_id: torchtune-cpu
+    provider_type: inline::torchtune-cpu
+    config:
+      checkpoint_format: meta
+    module: null
+  tool_runtime:
+  - provider_id: rag-runtime
+    provider_type: inline::rag-runtime
+    config: {}
+    module: null
+  telemetry:
+  - provider_id: meta-reference
+    provider_type: inline::meta-reference
+    config:
+      service_name: "${env.OTEL_SERVICE_NAME:=\u200B}"
+      sinks: ${env.TELEMETRY_SINKS:=console,sqlite}
+      sqlite_db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/llamastack-runpod}/trace_store.db
+      otel_exporter_otlp_endpoint: ${env.OTEL_EXPORTER_OTLP_ENDPOINT:=}
+    module: null
+  files:
+  - provider_id: localfs
+    provider_type: inline::localfs
+    config:
+      storage_dir: ${env.FILES_STORAGE_DIR:=~/.llama/distributions/llamastack-runpod/files}
+      metadata_store:
+        type: sqlite
+        db_path: ${env.SQLITE_STORE_DIR:=~/.llama/distributions/llamastack-runpod}/files_metadata.db
+    module: null
+metadata_store: null
+inference_store:
+  type: sqlite
+  db_path: ${env.SQLITE_STORE_DIR:=/Users/justin/.llama/distributions/llamastack-runpod}/inference_store.db
+models:
+- metadata: {}
+  model_id: runpod/deepcogito/cogito-v2-preview-llama-70B
+  provider_id: runpod
+  provider_model_id: deepcogito/cogito-v2-preview-llama-70B
+- metadata: {}
+  model_id: runpod/Qwen/Qwen2.5-72B-Instruct
+  provider_id: runpod
+  provider_model_id: Qwen/Qwen2.5-72B-Instruct
+- metadata: {}
+  model_id: runpod/qwen/qwen3-8b
+  provider_id: runpod
+  provider_model_id: qwen/qwen3-8b
+shields: []
+vector_dbs: []
+datasets: []
+scoring_fns: []
+benchmarks: []
+tool_groups: []
+logging: null
+server:
+  port: 8321
+  tls_certfile: null
+  tls_keyfile: null
+  tls_cafile: null
+  auth: null
+  host: null
+  quota: null
+  cors: null
+external_providers_dir: /Users/justin/.llama/providers.d
+external_apis_dir: null
